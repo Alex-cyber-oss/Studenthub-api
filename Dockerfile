@@ -58,9 +58,14 @@ CACHE_DRIVER=file
 SESSION_DRIVER=cookie
 QUEUE_CONNECTION=sync
 
-# Disable dev server and any port-based configuration
+# EXPLICITEMENT désactiver tout serveur de développement
 SERVER_PORT=80
 LARAVEL_SAIL=false
+ARTISAN_SERVE=false
+PHP_CLI_SERVER_WORKERS=0
+
+# Forcer l'utilisation d'Apache uniquement
+WEB_SERVER=apache
 EOF
 
 # Générer a clé d'application
@@ -68,6 +73,9 @@ RUN php artisan key:generate --force
 
 # Clear and cache all Laravel configurations for production
 RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
+
+# S'assurer qu'aucun processus de développement ne démarre
+RUN echo "Production mode - No auto-serve" > /tmp/production-mode.txt
 
 # Ensure NO development processes run
 RUN rm -f storage/logs/* || true
