@@ -26,35 +26,10 @@ WORKDIR /var/www/html
 COPY . .
 
 # Configurer Apache pour servir le répertoire public de Laravel
-RUN a2enmod rewrite \
-    && a2dissite 000-default || true
-
-# Créer un fichier de configuration Apache for Laravel
-RUN cat > /etc/apache2/sites-available/laravel.conf << 'EOF'
-<VirtualHost *:80>
-    DocumentRoot /var/www/html/public
-    
-    <Directory /var/www/html>
-        AllowOverride All
-        Require all granted
-    </Directory>
-    
-    <Directory /var/www/html/public>
-        AllowOverride All
-        Require all granted
-        RewriteEngine On
-        RewriteBase /
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule ^(.*)$ /index.php/$1 [L]
-    </Directory>
-    
-    ErrorLog ${APACHE_LOG_DIR}/laravel-error.log
-    CustomLog ${APACHE_LOG_DIR}/laravel-access.log combined
-</VirtualHost>
-EOF
-
-RUN a2dissite 000-default || true && a2ensite laravel
+RUN cp /var/www/html/docker/apache.conf /etc/apache2/sites-available/laravel.conf \
+    && a2enmod rewrite \
+    && a2dissite 000-default \
+    && a2ensite laravel
 
 # Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
