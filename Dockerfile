@@ -1,0 +1,36 @@
+FROM php:8.2-apache
+
+# Installer les extensions PHP nécessaires
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    unzip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd zip pdo pdo_mysql
+
+# Installer Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copier les fichiers du projet
+COPY . /var/www/html
+
+# Définir le répertoire de travail
+WORKDIR /var/www/html
+
+# Installer les dépendances PHP
+RUN composer install --no-dev --optimize-autoloader
+
+# Générer la clé d'application si elle n'existe pas
+RUN php artisan key:generate
+
+# Permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage
+
+# Exposer le port 80
+EXPOSE 80
+
+# Commande de démarrage
+CMD ["apache2-foreground"]

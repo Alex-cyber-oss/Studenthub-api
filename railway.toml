@@ -1,0 +1,19 @@
+# Railway Configuration
+# https://docs.railway.app/
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "php artisan serve --host=0.0.0.0 --port=$PORT"
+healthcheckPath = "/api/test"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+
+[environment]
+# Variables d'environnement pour Railway
+APP_ENV = "production"
+APP_DEBUG = "false"
+LOG_LEVEL = "error"
+DB_CONNECTION = "pgsql"
+# Les variables PG* seront automatiquement définies par Railway
