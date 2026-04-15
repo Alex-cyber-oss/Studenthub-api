@@ -22,8 +22,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Copier uniquement composer.json et composer.lock pour tirer parti du cache Docker
+# Copier les fichiers nécessaires à Composer et Laravel bootstrap avant l'installation
 COPY composer.json composer.lock ./
+COPY artisan ./
+COPY bootstrap ./bootstrap
 
 # Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
