@@ -25,6 +25,10 @@ WORKDIR /var/www/html
 # Copier l'application entière pour que Laravel puisse exécuter package discovery
 COPY . .
 
+# Configurer Apache pour servir le répertoire public de Laravel
+RUN a2enmod rewrite \
+    && sed -i -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
 # Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
