@@ -59,11 +59,34 @@ RUN a2dissite 000-default || true && a2ensite laravel
 # Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-# Créer le fichier .env depuis .env.example si nécessaire
-RUN php -r "file_exists('.env') || copy('.env.example', '.env');"
+# Créer le fichier .env pour production
+RUN cat > .env << 'EOF'
+APP_NAME=StudentHub
+APP_ENV=production
+APP_KEY=
+APP_DEBUG=false
+APP_URL=http://localhost
+
+LOG_CHANNEL=stack
+LOG_DEPRECATIONS_CHANNEL=null
+
+DB_CONNECTION=pgsql
+DB_HOST=localhost
+DB_PORT=5432
+DB_DATABASE=studenthub
+DB_USERNAME=postgres
+DB_PASSWORD=
+
+CACHE_DRIVER=file
+SESSION_DRIVER=cookie
+QUEUE_CONNECTION=sync
+EOF
 
 # Générer la clé d'application
 RUN php artisan key:generate
+
+# Clear Laravel cache and compile for production
+RUN php artisan config:cache && php artisan route:cache
 
 # Vérifier la configuration Apache
 RUN apache2ctl configtest || (echo "Apache config test failed" && exit 1)
@@ -76,5 +99,5 @@ RUN chown -R www-data:www-data /var/www/html \
 # Exposer le port 80
 EXPOSE 80
 
-# Commande de démarrage
+# Commande de démarrage - Apache uniquement, pas de serve
 CMD ["apache2-foreground"]
