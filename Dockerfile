@@ -22,16 +22,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Copier les fichiers nécessaires à Composer et Laravel bootstrap avant l'installation
-COPY composer.json composer.lock ./
-COPY artisan ./
-COPY bootstrap ./bootstrap
+# Copier l'application entière pour que Laravel puisse exécuter package discovery
+COPY . .
 
 # Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
-
-# Copier le reste du projet
-COPY . .
 
 # Créer le fichier .env depuis .env.example si nécessaire
 RUN php -r "file_exists('.env') || copy('.env.example', '.env');"
