@@ -1,5 +1,8 @@
 FROM php:8.4-apache
 
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_HOME=/tmp/composer
+
 # Installer les extensions PHP nécessaires
 RUN apt-get update && apt-get install -y \
     libpng-dev \
@@ -10,22 +13,26 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd zip pdo pdo_mysql pdo_pgsql
+    && docker-php-ext-install gd zip pdo pdo_mysql pdo_pgsql \
+    && rm -rf /var/lib/apt/lists/*
 
 # Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copier les fichiers du projet
-COPY . /var/www/html
-
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Installer les dépendances PHP avec update du lock file
-RUN composer update --no-dev --optimize-autoloader --no-interaction || composer install --no-dev --optimize-autoloader --no-interaction
+# Copier uniquement composer.json et composer.lock pour tirer parti du cache Docker
+COPY composer.json composer.lock ./
 
-# Créer le fichier .env depuis .env.example pour la build
-RUN cp .env.example .env
+# Installer les dépendances PHP
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+# Copier le reste du projet
+COPY . .
+
+# Créer le fichier .env depuis .env.example si nécessaire
+RUN php -r "file_exists('.env') || copy('.env.example', '.env');"
 
 # Générer la clé d'application
 RUN php artisan key:generate
