@@ -1,0 +1,14 @@
+.git
+.gitignore
+docker-compose.yml
+Dockerfile
+.dockerignore
+.env.example
+README.md
+storage/logs/*
+storage/framework/cache/*
+bootstrap/cache/*
+node_modules/
+.vscode
+.idea
+.DS_Store
