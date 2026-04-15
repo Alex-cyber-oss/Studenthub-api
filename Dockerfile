@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     libzip-dev \
+    libpq-dev \
     git \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
