@@ -3,7 +3,6 @@
 docker-compose.yml
 Dockerfile
 .dockerignore
-.env.example
 README.md
 storage/logs/*
 storage/framework/cache/*
