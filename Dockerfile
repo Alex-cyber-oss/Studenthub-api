@@ -91,9 +91,9 @@ RUN chown -R www-data:www-data /var/www/html \
 # Exposer le port 80
 EXPOSE 80
 
-# Health check
-HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=3 \
-    CMD curl -f http://localhost/api/test || exit 1
+# Health check (utilise le port injecté par Railway)
+HEALTHCHECK --interval=10s --timeout=5s --start-period=20s --retries=6 \
+    CMD sh -c 'curl -fsS "http://localhost:${PORT:-80}/api/test" || exit 1'
 
-# Commande de démarrage - Apache uniquement, pas de serve
-CMD ["apache2-foreground"]
+# Démarrage Apache sur le port dynamique Railway
+CMD ["sh", "-c", "PORT_TO_USE=${PORT:-80}; sed -i \"s/Listen 80/Listen ${PORT_TO_USE}/\" /etc/apache2/ports.conf; sed -i \"s/<VirtualHost \\*:80>/<VirtualHost *:${PORT_TO_USE}>/\" /etc/apache2/sites-available/laravel.conf; apache2-foreground"]
