@@ -24,7 +24,10 @@ WORKDIR /var/www/html
 # Installer les dépendances PHP avec update du lock file
 RUN composer update --no-dev --optimize-autoloader --no-interaction || composer install --no-dev --optimize-autoloader --no-interaction
 
-# Générer la clé d'application si elle n'existe pas
+# Créer le fichier .env depuis .env.example pour la build
+RUN cp .env.example .env
+
+# Générer la clé d'application
 RUN php artisan key:generate
 
 # Permissions
