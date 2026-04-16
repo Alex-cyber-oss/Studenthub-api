@@ -41,6 +41,30 @@ Route::get('/test', function () {
     }
 });
 
+// Route pour vérifier les tables de la base de données
+Route::get('/db-check', function () {
+    try {
+        DB::connection()->getPdo();
+
+        $tables = DB::select("
+            select tablename
+            from pg_tables
+            where schemaname = 'public'
+        ");
+
+        return response()->json([
+            'db_connected' => true,
+            'tables' => array_map(fn($row) => $row->tablename, $tables),
+            'tables_count' => count($tables),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'db_connected' => false,
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+});
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
