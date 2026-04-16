@@ -10,12 +10,19 @@ use App\Http\Controllers\ResourceController;
 
 // Route de test pour vérifier que la liaison avec la base de données fonctionne
 Route::get('/test', function () {
+    $connection = config('database.default');
+    $dbConfig = config("database.connections.{$connection}");
+
     try {
         DB::connection()->getPdo();
 
         return response()->json([
             'message' => 'API StudentHub fonctionne correctement !',
             'db_connected' => true,
+            'db_connection' => $connection,
+            'db_host' => $dbConfig['host'] ?? null,
+            'db_database' => $dbConfig['database'] ?? null,
+            'db_username' => $dbConfig['username'] ?? null,
             'status' => 'OK',
             'timestamp' => now(),
         ]);
@@ -23,6 +30,10 @@ Route::get('/test', function () {
         return response()->json([
             'message' => 'La connexion à la base de données a échoué.',
             'db_connected' => false,
+            'db_connection' => $connection,
+            'db_host' => $dbConfig['host'] ?? null,
+            'db_database' => $dbConfig['database'] ?? null,
+            'db_username' => $dbConfig['username'] ?? null,
             'error' => $e->getMessage(),
             'status' => 'ERROR',
             'timestamp' => now(),
