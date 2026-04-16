@@ -1,19 +1,33 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskReminderController;
 use App\Http\Controllers\ResourceController;
 
-// Route de test pour vérifier que l'API fonctionne
+// Route de test pour vérifier que la liaison avec la base de données fonctionne
 Route::get('/test', function () {
-    return response()->json([
-        'message' => 'API StudentHub fonctionne correctement !',
-        'status' => 'OK',
-        'timestamp' => now()
-    ]);
+    try {
+        DB::connection()->getPdo();
+
+        return response()->json([
+            'message' => 'API StudentHub fonctionne correctement !',
+            'db_connected' => true,
+            'status' => 'OK',
+            'timestamp' => now(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'La connexion à la base de données a échoué.',
+            'db_connected' => false,
+            'error' => $e->getMessage(),
+            'status' => 'ERROR',
+            'timestamp' => now(),
+        ], 500);
+    }
 });
 
 Route::post('/register', [AuthController::class, 'register']);
