@@ -27,7 +27,10 @@ return [
         'https://studenthub-frontend-vhpt-al6vtbwus-alexs-projects-3dc248bb.vercel.app',
     ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '#^https://studenthub-frontend-vhpt-[a-z0-9-]+-alexs-projects-3dc248bb\.vercel\.app$#',
+        '#^https://studenthub-frontend-.*\.vercel\.app$#',
+    ],
 
     'allowed_headers' => ['*'],
 
