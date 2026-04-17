@@ -25,6 +25,7 @@ return [
         'http://127.0.0.1:5173',
         'https://studenthub-frontend-alpha.vercel.app',
         'https://studenthub-frontend-vhpt-al6vtbwus-alexs-projects-3dc248bb.vercel.app',
+        'https://stdh.vercel.app',
     ],
 
     'allowed_origins_patterns' => [
